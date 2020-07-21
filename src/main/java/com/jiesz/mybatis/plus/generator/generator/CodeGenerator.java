@@ -25,7 +25,7 @@ public class CodeGenerator {
     private static final String parentPackageName = "com.jiesz.mybatis.plus.generator";
     private static final IdType idType = IdType.AUTO;
     private static final String ignoreTablePrefix = null;
-    private static final String logicDeleteFieldName = null;
+    private static final String logicDeleteFieldName = "state";
     private static final String versionFieldName = null;
     private static final String projectPath = System.getProperty("user.dir");
 

@@ -33,7 +33,7 @@ import ${superControllerClassPackage};
 <#else>
 @Controller
 </#if>
-@RequestMapping("/<#if controllerMappingHyphenStyle??>${controllerMappingHyphen}<#else>${table.entityPath}</#if>")
+@RequestMapping("/api")
 @Validated
 @Api(tags = "${table.comment!}管理")
 <#if kotlin>
@@ -44,15 +44,15 @@ public class ${table.controllerName} extends ${superControllerClass} {
 <#else>
 public class ${table.controllerName} {
 </#if>
- @Resource
- private ${table.serviceName} ${table.serviceName?uncap_first};
+   @Resource
+   private ${table.serviceName} ${table.serviceName?uncap_first};
 
- @ApiOperation("添加${table.comment!}")
- @PostMapping("/<#if controllerMappingHyphenStyle??>${controllerMappingHyphen}<#else>${table.entityPath}</#if>/add")
- public ${entity} insert(${entity} ${entity?uncap_first}
- ) throws Exception {
- ${entity?uncap_first}.insert();
- return ${entity?uncap_first};
- }
+   @ApiOperation("添加${table.comment!}")
+   @PostMapping("/<#if controllerMappingHyphenStyle??>${controllerMappingHyphen}<#else>${table.entityPath}</#if>")
+   public ${entity} insert(@RequestBody @Validated${entity} ${entity?uncap_first}
+   ) throws Exception {
+   ${entity?uncap_first}.insert();
+   return ${entity?uncap_first};
+   }
 }
 </#if>

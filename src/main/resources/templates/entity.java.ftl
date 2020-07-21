@@ -106,9 +106,7 @@ public class ${entity} implements Serializable {
     @JsonIgnore
     @TableField(exist = false)
     private Integer offset;
-
 <#------------  END 字段循环遍历  ---------->
-
 <#if !entityLombokModel>
     <#list table.fields as field>
         <#if field.propertyType == "boolean">
