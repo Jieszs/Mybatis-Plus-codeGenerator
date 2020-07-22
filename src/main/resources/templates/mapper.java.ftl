@@ -16,9 +16,14 @@ import java.util.List;
 interface ${table.mapperName} : ${superMapperClass}<${entity}>
 <#else>
 public interface ${table.mapperName} extends ${superMapperClass}<${entity}> {
- /**
- * 获取列表
- */
- List<${entity}> list(${entity} entity);
+  /**
+  * 获取列表
+  */
+  List<${entity}> list(${entity} ${entity?uncap_first});
+
+  /**
+  * 获取总数
+  */
+  Integer count(${entity} ${entity?uncap_first});
 }
 </#if>

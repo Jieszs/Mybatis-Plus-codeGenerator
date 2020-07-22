@@ -28,6 +28,7 @@ public class CodeGenerator {
     private static final String logicDeleteFieldName = "state";
     private static final String versionFieldName = null;
     private static final String projectPath = System.getProperty("user.dir");
+    private static final Boolean enablePage = true;
 
     public static void main(String[] args) {
         // 代码生成器
@@ -41,13 +42,6 @@ public class CodeGenerator {
         //包名配置
         PackageConfig pc = getPackageConfig();
         mpg.setPackageInfo(pc);
-        //自定义注入信息配置
-        InjectionConfig cfg=getInjectionConfig();
-        // 自定义输出文件配置
-        List<FileOutConfig> focList = new ArrayList<>();
-        setFileOutConfig(focList);
-        cfg.setFileOutConfigList(focList);
-        mpg.setCfg(cfg);
         //模板配置
         TemplateConfig templateConfig = getTemplateConfig();
         mpg.setTemplate(templateConfig);
@@ -55,6 +49,17 @@ public class CodeGenerator {
         //策略配置
         StrategyConfig strategy = getStrategyConfig();
         mpg.setStrategy(strategy);
+        //自定义注入信息配置
+        Map<String, Object> map = new HashMap<>();
+        map.put("parentPackageName", parentPackageName);
+        map.put("entityName", entityName);
+        map.put("enablePage", enablePage);
+        InjectionConfig cfg = getInjectionConfig(map);
+        // 自定义输出文件配置
+        List<FileOutConfig> focList = new ArrayList<>();
+        setFileOutConfig(focList);
+        cfg.setFileOutConfigList(focList);
+        mpg.setCfg(cfg);
         //生成
         mpg.execute();
     }
@@ -75,12 +80,11 @@ public class CodeGenerator {
      *
      * @return
      */
-    private static InjectionConfig getInjectionConfig() {
+    private static InjectionConfig getInjectionConfig(Map<String, Object> map) {
         // 自定义配置
         InjectionConfig cfg = new InjectionConfig() {
             @Override
             public void initMap() {
-                Map<String, Object> map = new HashMap<>();
                 this.setMap(map);
             }
         };

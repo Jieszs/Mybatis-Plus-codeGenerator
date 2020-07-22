@@ -1,16 +1,18 @@
 package ${package.Controller};
 
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
+import ${cfg.parentPackageName}.exception.model.ApiResponse;
 import ${package.Entity}.${entity};
 import ${package.Service}.${table.serviceName};
-
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.util.List;
 <#if restControllerStyle>
 import org.springframework.web.bind.annotation.RestController;
 <#else>
@@ -49,10 +51,53 @@ public class ${table.controllerName} {
 
    @ApiOperation("添加${table.comment!}")
    @PostMapping("/<#if controllerMappingHyphenStyle??>${controllerMappingHyphen}<#else>${table.entityPath}</#if>")
-   public ${entity} insert(@RequestBody @Validated${entity} ${entity?uncap_first}
+   public ApiResponse insert(@RequestBody @Validated ${entity} ${entity?uncap_first}
    ) throws Exception {
    ${entity?uncap_first}.insert();
-   return ${entity?uncap_first};
+   return ApiResponse.ofSuccess(${entity?uncap_first});
    }
+
+    @ApiOperation("修改${table.comment!}")
+    @PutMapping("/<#if controllerMappingHyphenStyle??>${controllerMappingHyphen}<#else>${table.entityPath}</#if>")
+    public ApiResponse update(@RequestBody @Validated ${entity} ${entity?uncap_first}
+    ) throws Exception {
+    ${entity?uncap_first}.updateById();
+    return ApiResponse.ofSuccess(${entity?uncap_first});
+    }
+
+@ApiOperation("获取${table.comment!}列表")
+@GetMapping("/<#if controllerMappingHyphenStyle??>${controllerMappingHyphen}<#else>${table.entityPath}</#if>")
+public ApiResponse list(
+<#if (cfg.enablePage!"") == true>
+    @RequestParam(defaultValue = "0") @ApiParam(value = "偏移量") Integer offset,
+    @RequestParam(defaultValue = "10") @ApiParam(value = "限制") Integer limit,
+</#if>
+<#list table.fields as field>
+    @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName},
+</#list>
+) throws Exception {
+${entity} condition = ${entity}.builder()
+                            <#list table.fields as field>
+                                .${field.propertyName}(${field.propertyName})
+                            </#list>
+                               .build();
+Integer total = ${table.serviceName?uncap_first}.count(condition);
+List<${entity}> list = new ArrayList<>();
+    if (total > 0) {
+    <#if (cfg.enablePage!"") == true>
+        condition.setOffset(offset);
+        condition.setLimit(limit);
+    </#if>
+    list = ${table.serviceName?uncap_first}.list(condition);
+    }
+    Page<${entity}> result =new Page<>();
+        result.setTotal(total);
+        result.setRecords(list);
+    <#if (cfg.enablePage!"") == true>
+        result.setCurrent(offset);
+        result.setSize(limit);
+    </#if>
+        return ApiResponse.ofSuccess(result);
+        }
 }
 </#if>

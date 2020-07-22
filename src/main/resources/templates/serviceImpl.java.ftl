@@ -27,11 +27,17 @@ public class ${table.serviceImplName} extends ${superServiceImplClass}<${table.m
 
  @Resource
  private ${table.mapperName} ${table.mapperName?uncap_first};
- /**
- * 获取列表
- */
- public List<${entity}> list(${entity} ${entity?uncap_first}){
-    return ${table.mapperName?uncap_first}.list(${entity?uncap_first});
- }
+  /**
+  * 获取列表
+  */
+  public List<${entity}> list(${entity} ${entity?uncap_first}){
+     return ${table.mapperName?uncap_first}.list(${entity?uncap_first});
+  }
+  /**
+  * 获取总数
+  */
+  public Integer count(${entity} ${entity?uncap_first}){
+  return ${table.mapperName?uncap_first}.count(${entity?uncap_first});
+  }
 }
 </#if>

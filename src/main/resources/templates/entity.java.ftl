@@ -11,7 +11,10 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
     <#if chainModel>
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.Builder;
     </#if>
 </#if>
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -33,13 +36,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
     </#if>
     <#if chainModel>
 @Accessors(chain = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
     </#if>
 </#if>
 <#if table.convert>
 @TableName("${table.name}")
 </#if>
 <#if swagger2>
-@ApiModel(value="${entity}对象", description="${table.comment!}")
+@ApiModel(value = "${entity}对象", description = "${table.comment!}")
 </#if>
 <#if superEntityClass??>
 public class ${entity} extends ${superEntityClass}<#if activeRecord><${entity}></#if> {
@@ -60,7 +66,10 @@ public class ${entity} implements Serializable {
 
     <#if field.comment!?length gt 0>
         <#if swagger2>
+        <#-- 逻辑删除注解 -->
+            <#if (logicDeleteFieldName!"") != field.name>
     @ApiModelProperty(value = "${field.comment}")
+            </#if>
         <#else>
     /**
      * ${field.comment}
@@ -94,18 +103,21 @@ public class ${entity} implements Serializable {
     <#-- 逻辑删除注解 -->
     <#if (logicDeleteFieldName!"") == field.name>
     @TableLogic
+    @JsonIgnore
     </#if>
     private ${field.propertyType} ${field.propertyName};
 </#list>
-/**
-*  非数据库字段
-*/
+    /**
+    *  非数据库字段
+    */
+<#if (cfg.enablePage!"") == true>
     @JsonIgnore
     @TableField(exist = false)
-    private Integer Limit;
+    private Integer limit;
     @JsonIgnore
     @TableField(exist = false)
     private Integer offset;
+</#if>
 <#------------  END 字段循环遍历  ---------->
 <#if !entityLombokModel>
     <#list table.fields as field>

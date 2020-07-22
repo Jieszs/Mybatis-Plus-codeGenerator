@@ -41,10 +41,15 @@
         FROM ${table.name}
         <where>
          <#list table.fields as field>
-            <if test="${field.propertyName}!=null and ${field.propertyName}!=''">
-               AND ${field.name} = <#noparse>#</#noparse>{${field.propertyName}}
-            </if>
+             <#if (logicDeleteFieldName!"") == field.name>
+            ${field.name} = 1
+             </#if>
          </#list>
+        <#list table.fields as field>
+           <if test="${field.propertyName}!=null and ${field.propertyName}!=''">
+                AND ${field.name} = <#noparse>#</#noparse>{${field.propertyName}}
+            </if>
+        </#list>
         </where>
     </sql>
     <!--获取列表-->
@@ -52,10 +57,18 @@
         SELECT
         <include refid="Base_Column_List"/>
         <include refid="where"/>
-        <#noparse>
+        <#if (cfg.enablePage!"") == true>
+            <#noparse>
         <if test="offset !=null and limit !=null">
-            LIMIT #{offset},#{limit}
+           LIMIT #{offset},#{limit}
         </if>
-        </#noparse>
+            </#noparse>
+        </#if>
+    </select>
+
+    <!--获取总数-->
+    <select id="count" parameterType="${package.Entity}.${table.entityName}" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        <include refid="where"/>
     </select>
 </mapper>

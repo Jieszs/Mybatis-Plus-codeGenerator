@@ -15,9 +15,14 @@ import java.util.List;
 interface ${table.serviceName} : ${superServiceClass}<${entity}>
 <#else>
 public interface ${table.serviceName} extends ${superServiceClass}<${entity}> {
-/**
-* 获取列表
-*/
-List<${entity}> list(${entity} ${entity?uncap_first});
+ /**
+ * 获取列表
+ */
+ List<${entity}> list(${entity} ${entity?uncap_first});
+
+  /**
+  * 获取总数
+  */
+  Integer count(${entity} ${entity?uncap_first});
 }
 </#if>
