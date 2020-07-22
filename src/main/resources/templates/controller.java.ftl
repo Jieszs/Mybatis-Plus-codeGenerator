@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.validation.annotation.Validated;
 import javax.annotation.Resource;
 import ${cfg.parentPackageName}.exception.model.ApiResponse;
+import ${cfg.parentPackageName}.exception.JsonException;
 import ${package.Entity}.${entity};
 import ${package.Service}.${table.serviceName};
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -21,7 +22,13 @@ import org.springframework.stereotype.Controller;
 <#if superControllerClassPackage??>
 import ${superControllerClassPackage};
 </#if>
-
+<#list table.fields as field>
+<#if field.keyFlag>
+    <#assign keyPropertyName="${field.propertyName}"/>
+    <#assign keyPropertyType="${field.propertyType}"/>
+    <#assign keyComment="${field.comment}"/>
+</#if>
+</#list>
 /**
  * <p>
  * ${table.comment!} 前端控制器
@@ -61,6 +68,7 @@ public class ${table.controllerName} {
     @PutMapping("/<#if controllerMappingHyphenStyle??>${controllerMappingHyphen}<#else>${table.entityPath}</#if>")
     public ApiResponse update(@RequestBody @Validated ${entity} ${entity?uncap_first}
     ) throws Exception {
+    if (${entity?uncap_first}.selectById() == null) throw new JsonException(404, "${table.comment!}不存在");
     ${entity?uncap_first}.updateById();
     return ApiResponse.ofSuccess(${entity?uncap_first});
     }
@@ -73,7 +81,11 @@ public ApiResponse list(
     @RequestParam(defaultValue = "10") @ApiParam(value = "限制") Integer limit,
 </#if>
 <#list table.fields as field>
-    @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName},
+    <#if field_has_next>
+        @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName},
+    <#else>
+        @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName}
+    </#if>
 </#list>
 ) throws Exception {
 ${entity} condition = ${entity}.builder()
@@ -98,6 +110,25 @@ List<${entity}> list = new ArrayList<>();
         result.setSize(limit);
     </#if>
         return ApiResponse.ofSuccess(result);
-        }
+    }
+
+    @ApiOperation("获取${table.comment!}详情")
+    @GetMapping("/<#if controllerMappingHyphenStyle??>${controllerMappingHyphen}<#else>${table.entityPath}</#if>/{${keyPropertyName}}")
+    public ApiResponse get(@PathVariable @ApiParam(value = "${keyComment}", required = true) ${keyPropertyType} ${keyPropertyName}
+    ) throws Exception {
+    ${entity} condition = ${entity}.builder().${keyPropertyName}(${keyPropertyName}).build();
+    ${entity} result = condition.selectById();
+    return ApiResponse.ofSuccess(result);
+    }
+
+    @ApiOperation("删除${table.comment!}")
+    @DeleteMapping("/<#if controllerMappingHyphenStyle??>${controllerMappingHyphen}<#else>${table.entityPath}</#if>/{${keyPropertyName}}")
+    public ApiResponse delete(@PathVariable @ApiParam(value = "${keyComment}", required = true) ${keyPropertyType} ${keyPropertyName}
+    ) throws Exception {
+    ${entity} condition = ${entity}.builder().${keyPropertyName}(${keyPropertyName}).build();
+    if (condition.selectById() == null) throw new JsonException(404, "${table.comment!}不存在");
+    condition.deleteById();
+    return ApiResponse.ofMessage("删除成功");
+    }
 }
 </#if>

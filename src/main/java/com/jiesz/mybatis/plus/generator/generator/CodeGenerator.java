@@ -28,7 +28,7 @@ public class CodeGenerator {
     private static final String logicDeleteFieldName = "state";
     private static final String versionFieldName = null;
     private static final String projectPath = System.getProperty("user.dir");
-    private static final Boolean enablePage = true;
+    private static final Boolean enablePage = false;
 
     public static void main(String[] args) {
         // 代码生成器
