@@ -14,14 +14,15 @@ import java.security.PublicKey;
 import java.util.*;
 
 public class CodeGenerator {
-    private static final String tableName = "user_info";
-    private static final String entityName = "User";
-    private static final Boolean enablePage = true;
-    private static final Boolean enableTree = false;
+    private static final String tableName = "tag_info";
+    private static final String entityName = "Tag";
+    private static final Boolean enablePage = false;
+    private static final Boolean enableTree = true;
     private static final List<String> saveAndUpdateIgnoreFields = Arrays.asList("insertTime", "updateTime", "state");
     private static final List<String> selectIgnoreFields = Arrays.asList("insertTime", "updateTime", "state");
     private static final IdType idType = IdType.AUTO;
     private static final String logicDeleteFieldName = "state";
+    private static final String existFieldName = "tagName";
     private static final String url = "jdbc:mysql://localhost:3306/mptest?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatementshedStatements=true&allowMultiQueries=true";
     private static final String username = "root";
     private static final String password = "123456";
@@ -58,6 +59,7 @@ public class CodeGenerator {
         map.put("enableTree", enableTree);
         map.put("saveAndUpdateIgnoreFields", saveAndUpdateIgnoreFields);
         map.put("selectIgnoreFields", selectIgnoreFields);
+        map.put("existFieldName", existFieldName);
         InjectionConfig cfg = getInjectionConfig(map);
         // 自定义输出文件配置
         List<FileOutConfig> focList = new ArrayList<>();
