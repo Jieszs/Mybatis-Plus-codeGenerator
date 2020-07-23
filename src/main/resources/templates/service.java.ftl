@@ -24,5 +24,11 @@ public interface ${table.serviceName} extends ${superServiceClass}<${entity}> {
   * 获取总数
   */
   Integer count(${entity} ${entity?uncap_first});
+ <#if (cfg.enableTree!"") == true>
+   /**
+   *获取树
+   */
+   List<${entity}> getTree(${entity} ${entity?uncap_first});
+ </#if>
 }
 </#if>

@@ -57,7 +57,7 @@ public class ${table.controllerName} {
    private ${table.serviceName} ${table.serviceName?uncap_first};
 
    @ApiOperation("添加${table.comment!}")
-   @PostMapping("/<#if controllerMappingHyphenStyle??>${controllerMappingHyphen}<#else>${table.entityPath}</#if>")
+   @PostMapping("/${cfg.urlName}")
    public ApiResponse insert(@RequestBody @Validated ${entity} ${entity?uncap_first}
    ) throws Exception {
    ${entity?uncap_first}.insert();
@@ -65,7 +65,7 @@ public class ${table.controllerName} {
    }
 
     @ApiOperation("修改${table.comment!}")
-    @PutMapping("/<#if controllerMappingHyphenStyle??>${controllerMappingHyphen}<#else>${table.entityPath}</#if>")
+    @PutMapping("/${cfg.urlName}")
     public ApiResponse update(@RequestBody @Validated ${entity} ${entity?uncap_first}
     ) throws Exception {
     if (${entity?uncap_first}.selectById() == null) throw new JsonException(404, "${table.comment!}不存在");
@@ -74,7 +74,7 @@ public class ${table.controllerName} {
     }
 
 @ApiOperation("获取${table.comment!}列表")
-@GetMapping("/<#if controllerMappingHyphenStyle??>${controllerMappingHyphen}<#else>${table.entityPath}</#if>")
+@GetMapping("/${cfg.urlName}")
 public ApiResponse list(
 <#if (cfg.enablePage!"") == true>
     @RequestParam(defaultValue = "0") @ApiParam(value = "偏移量") Integer offset,
@@ -111,9 +111,29 @@ List<${entity}> list = new ArrayList<>();
     </#if>
         return ApiResponse.ofSuccess(result);
     }
-
+    <#if (cfg.enableTree!"") == true>
+    @ApiOperation("获取${table.comment!}树")
+    @GetMapping("/${cfg.urlName}/tree")
+    public ApiResponse getTree(
+    <#list table.fields as field>
+        <#if field_has_next>
+            @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName},
+        <#else>
+            @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName}
+        </#if>
+    </#list>
+    ) throws Exception {
+    ${entity} condition = ${entity}.builder()
+    <#list table.fields as field>
+        .${field.propertyName}(${field.propertyName})
+    </#list>
+    .build();
+    List<${entity}> tree = ${table.serviceName?uncap_first}.getTree(condition);
+    return ApiResponse.ofSuccess(tree);
+    }
+    </#if>
     @ApiOperation("获取${table.comment!}详情")
-    @GetMapping("/<#if controllerMappingHyphenStyle??>${controllerMappingHyphen}<#else>${table.entityPath}</#if>/{${keyPropertyName}}")
+    @GetMapping("/${cfg.urlName}/{${keyPropertyName}}")
     public ApiResponse get(@PathVariable @ApiParam(value = "${keyComment}", required = true) ${keyPropertyType} ${keyPropertyName}
     ) throws Exception {
     ${entity} condition = ${entity}.builder().${keyPropertyName}(${keyPropertyName}).build();
@@ -122,7 +142,7 @@ List<${entity}> list = new ArrayList<>();
     }
 
     @ApiOperation("删除${table.comment!}")
-    @DeleteMapping("/<#if controllerMappingHyphenStyle??>${controllerMappingHyphen}<#else>${table.entityPath}</#if>/{${keyPropertyName}}")
+    @DeleteMapping("/${cfg.urlName}/{${keyPropertyName}}")
     public ApiResponse delete(@PathVariable @ApiParam(value = "${keyComment}", required = true) ${keyPropertyType} ${keyPropertyName}
     ) throws Exception {
     ${entity} condition = ${entity}.builder().${keyPropertyName}(${keyPropertyName}).build();

@@ -18,7 +18,7 @@ import lombok.Builder;
     </#if>
 </#if>
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import java.util.List;
 /**
  * <p>
  * ${table.comment!}
@@ -102,6 +102,9 @@ public class ${entity} implements Serializable {
     </#if>
     <#-- 逻辑删除注解 -->
     <#if (logicDeleteFieldName!"") == field.name>
+     /**
+    *  逻辑删除字段 1正常0删除
+    */
     @TableLogic
     @JsonIgnore
     </#if>
@@ -117,6 +120,11 @@ public class ${entity} implements Serializable {
     @JsonIgnore
     @TableField(exist = false)
     private Integer offset;
+</#if>
+<#if (cfg.enableTree!"") == true>
+    //孩子
+    @TableField(exist = false)
+    private List<${entity}> children;
 </#if>
 <#------------  END 字段循环遍历  ---------->
 <#if !entityLombokModel>

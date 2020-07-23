@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 public class CodeGenerator {
-    private static final String tableName = "user_info";
-    private static final String entityName = "User";
+    private static final String tableName = "tag_info";
+    private static final String entityName = "Tag";
     private static final String url = "jdbc:mysql://localhost:3306/mptest?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatementshedStatements=true&allowMultiQueries=true";
     private static final String username = "root";
     private static final String password = "123456";
@@ -29,6 +29,7 @@ public class CodeGenerator {
     private static final String versionFieldName = null;
     private static final String projectPath = System.getProperty("user.dir");
     private static final Boolean enablePage = false;
+    private static final Boolean enableTree = true;
 
     public static void main(String[] args) {
         // 代码生成器
@@ -52,8 +53,9 @@ public class CodeGenerator {
         //自定义注入信息配置
         Map<String, Object> map = new HashMap<>();
         map.put("parentPackageName", parentPackageName);
-        map.put("entityName", entityName);
+        map.put("urlName", entityName.toLowerCase() + "s");
         map.put("enablePage", enablePage);
+        map.put("enableTree", enableTree);
         InjectionConfig cfg = getInjectionConfig(map);
         // 自定义输出文件配置
         List<FileOutConfig> focList = new ArrayList<>();
@@ -174,7 +176,7 @@ public class CodeGenerator {
         gc.setBaseColumnList(true);
         //主键策略
         gc.setIdType(idType);
-        gc.setEntityName(entityName);
+        gc.setEntityName(entityName + "Vo");
         gc.setControllerName(entityName + "Api");
         gc.setMapperName(entityName + "Mapper");
         gc.setServiceName("I" + entityName + "Service");
