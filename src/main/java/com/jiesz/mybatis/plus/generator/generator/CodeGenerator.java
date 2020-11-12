@@ -10,21 +10,24 @@ import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 import org.springframework.util.StringUtils;
 
-import java.security.PublicKey;
 import java.util.*;
 
 public class CodeGenerator {
-    private static final String tableName = "tag_info";
-    private static final String entityName = "Tag";
-    private static final Boolean enablePage = false;
-    private static final Boolean enableTree = true;
+    private static final String tableName = "drill_template";
+    private static final String entityName = "drillTemplate";
+    private static final Boolean enablePage = true;
+    private static final Boolean enableTree = false;
+    //保存和更新忽略字段
     private static final List<String> saveAndUpdateIgnoreFields = Arrays.asList("insertTime", "updateTime", "state");
+    //查询忽略字段
     private static final List<String> selectIgnoreFields = Arrays.asList("insertTime", "updateTime", "state");
-    private static final IdType idType = IdType.AUTO;
+    private static final IdType idType = IdType.INPUT;
+    //逻辑删除字段
     private static final String logicDeleteFieldName = "state";
-    private static final String existFieldName = "tagName";
-    private static final String url = "jdbc:mysql://localhost:3306/mptest?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatementshedStatements=true&allowMultiQueries=true";
-    private static final String username = "root";
+    //不允許重复字段
+    private static final String existFieldName = null;
+    private static final String url = "jdbc:oracle:thin:@//localhost:1521/orcl";
+    private static final String username = "C##root";
     private static final String password = "123456";
     private static final String parentPackageName = "com.jiesz.mybatis.plus.generator";
     private static final String ignoreTablePrefix = null;
@@ -181,7 +184,7 @@ public class CodeGenerator {
         //主键策略
         gc.setIdType(idType);
         gc.setEntityName(entityName + "Vo");
-        gc.setControllerName(entityName + "Api");
+        gc.setControllerName(entityName + "Controller");
         gc.setMapperName(entityName + "Mapper");
         gc.setServiceName("I" + entityName + "Service");
         gc.setServiceImplName(entityName + "ServiceImpl");
@@ -197,7 +200,7 @@ public class CodeGenerator {
         // 数据源配置
         DataSourceConfig dsc = new DataSourceConfig();
         dsc.setUrl(url);
-        dsc.setDriverName("com.mysql.cj.jdbc.Driver");
+        dsc.setDriverName("oracle.jdbc.OracleDriver");
         dsc.setUsername(username);
         dsc.setPassword(password);
         return dsc;

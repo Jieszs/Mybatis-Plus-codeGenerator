@@ -1,28 +1,50 @@
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://localhost:3306/mptest?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatementshedStatements=true&allowMultiQueries=true
-    username: root
+  #    url: jdbc:mysql://localhost:3306/mptest?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatementshedStatements=true&allowMultiQueries=true
+    url: jdbc:oracle:thin:@//localhost:1521/orcl
+    #    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: oracle.jdbc.OracleDriver
+    username: C##root
     password: 123456
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    initialSize: 20 #初始化时建立的物理连接个数
-    maxActive: 100 #最大连接数量
-    minIdle: 10 #最小连接数量
-    maxWait: 60000 #获取连接时的最大等待时间（毫秒）
-    poolPreparedStatements: true  #启用PSCache
-    maxPoolPreparedStatementPerConnectionSize: 50
-    validationQuery: SELECT 1 #检测连接是否有效
-    testOnBorrow: false #申请连接时执行validationQuery，若启用会降低性能
-    testOnReturn: false #归还连接时执行validationQuery，若启用会降低性能
-    testWhileIdle: true #申请连接时，如果空闲时间大于timeBetweenEvictionRunsMillis，则执行validationQuery
-    timeBetweenEvictionRunsMillis: 600000 #连接空闲时间超过该值时（毫秒），则被回收
-    minEvictableIdleTimeMillis: 300000  #连接在连接池中的最小生存时间（毫秒）
-    filters: stat,log4j2,wall #监控统计filters
+    druid:
+      connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+      filters: stat,wall
+      initial-size: 5
+      max-active: 20
+      max-pool-prepared-statement-per-connection-size: 20
+      max-wait: 60000
+      min-evictable-idle-time-millis: 30000
+      min-idle: 5
+      test-on-borrow: false
+      test-on-return: false
+      test-while-idle: true
+      time-between-eviction-runs-millis: 60000
+      use-global-data-source-stat: true
+      #validation-query: select 'x'
+      validation-query: select 1 from dual
+      stat-view-servlet:
+        allow: ''
+        deny: ''
+        enabled: true
+        login-username: admin
+        login-password: ENC(aTtkWaNYFlov2jHLO4aFVQ==)
+        reset-enable: true
+        url-pattern: /druid/*
+      web-stat-filter:
+        enabled: true
+        exclusions: '*.gif,*.png,*.jpg,*.html,*.js,*.css,*.ico,/druid/*'
+        url-pattern: /*
 
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
   global-config:
+
     db-config:
+      #逻辑删除配置
       logic-delete-value: 0
       logic-not-delete-value: 1
+    #主键类型  0:"数据库ID自增",1:为空, 2:"用户输入ID",3:"全局唯一ID (数字类型唯一ID)", 4:"全局唯一ID UUID";
+      id-type: INPUT
