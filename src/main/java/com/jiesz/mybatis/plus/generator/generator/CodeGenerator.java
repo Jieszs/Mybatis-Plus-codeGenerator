@@ -8,13 +8,14 @@ import com.baomidou.mybatisplus.generator.config.*;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
 
 public class CodeGenerator {
-    private static final String tableName = "drill_template";
-    private static final String entityName = "drillTemplate";
+    private static final String tableName = "DRILL_TEMPLATE";
+    private static final String entityName = "DrillTemplate";
     private static final Boolean enablePage = true;
     private static final Boolean enableTree = false;
     //保存和更新忽略字段
@@ -74,12 +75,12 @@ public class CodeGenerator {
     }
 
     private static void setFileOutConfig(List<FileOutConfig> focList) {
-        String templatePath = "/templates/mapper.xml.ftl";
+        String mappterTemplatePath = "/templates/mapper.xml.ftl";
         // 自定义配置会被优先输出
-        focList.add(new FileOutConfig(templatePath) {
+        focList.add(new FileOutConfig(mappterTemplatePath) {
             @Override
             public String outputFile(TableInfo tableInfo) {
-                return projectPath + "/src/main/resources/mapper/" + tableInfo.getEntityName() + "Mapper" + StringPool.DOT_XML;
+                return projectPath + "/src/main/resources/mapper/" + entityName + "Mapper" + StringPool.DOT_XML;
             }
         });
     }
@@ -183,7 +184,7 @@ public class CodeGenerator {
         gc.setBaseColumnList(true);
         //主键策略
         gc.setIdType(idType);
-        gc.setEntityName(entityName + "Vo");
+        gc.setEntityName(entityName );
         gc.setControllerName(entityName + "Controller");
         gc.setMapperName(entityName + "Mapper");
         gc.setServiceName("I" + entityName + "Service");
