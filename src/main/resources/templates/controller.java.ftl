@@ -74,7 +74,7 @@ public Result<${entity}> insert(
             </#list>
         </#if>
         <#if isOk == 1>
-                @RequestParam @ApiParam(value = "${field.comment}",required = true) ${field.propertyType} ${field.propertyName},
+                @RequestParam @ApiParam(value = "${field.comment}",required = true) ${field.propertyType} ${field.propertyName}<#if field_has_next>,</#if>
         </#if>
     </#list>
     )  {
@@ -119,7 +119,7 @@ public Result update(
             </#list>
         </#if>
         <#if isOk == 1>
-            @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName},
+            @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName}<#if field_has_next>,</#if>
         </#if>
     </#list>
     )  {
@@ -143,7 +143,7 @@ public Result update(
     return Result.fail(ResultCode.PARAM_NOT_COMPLETE_ERROR);
     }
     ${entity?uncap_first}.updateById();
-    return Result.success("修改成功");
+    return Result.success();
     }
 
     @ApiOperation("获取${table.comment!}列表")
@@ -169,7 +169,7 @@ public Result update(
             </#list>
         </#if>
         <#if isOk == 1>
-                @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName},
+                @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName}<#if field_has_next>,</#if>
         </#if>
     </#list>
     ) {
@@ -192,15 +192,23 @@ public Result update(
         </#if>
     </#list>
     .build();
+    Integer total = ${table.serviceName?uncap_first}.count(condition);
+    List<${entity}> list = new ArrayList<>();
+    if (total > 0) {
+    <#if (cfg.enablePage!"") == true>
+        condition.setOffset(offset);
+        condition.setLimit(limit);
+    </#if>
+    list = ${table.serviceName?uncap_first}.list(condition);
+    }
     <#if (cfg.enablePage!"") == true>
         Page<${entity}> result =new Page<>();
+        result.setTotal(total);
+        result.setRecords(list);
         result.setCurrent(offset);
         result.setSize(limit);
-        QueryWrapper<${entity}> wrapper = new QueryWrapper<>();
-        condition.selectPage(result, wrapper);
      return Result.success(result);
-        <#else>
-     List<${entity}> list = ${table.serviceName?uncap_first}.list(condition);
+    <#else >
      return Result.success(list);
     </#if>
 
@@ -224,7 +232,7 @@ public Result update(
                 </#list>
             </#if>
             <#if isOk == 1>
-                    @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName},
+                    @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName}<#if field_has_next>,</#if>
             </#if>
         </#list>
         )  {
