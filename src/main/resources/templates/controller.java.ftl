@@ -47,19 +47,19 @@ import java.util.List;
 @Validated
 @Api(tags = "${table.comment!}管理")
 <#if kotlin>
-    class ${table.controllerName}<#if superControllerClass??> : ${superControllerClass}()</#if>
+class ${table.controllerName}<#if superControllerClass??> : ${superControllerClass}()</#if>
 <#else>
-    <#if superControllerClass??>
-        public class ${table.controllerName} extends ${superControllerClass} {
-    <#else>
-        public class ${table.controllerName} {
-    </#if>
-    @Resource
-    private ${table.serviceName} ${table.serviceName?uncap_first};
+<#if superControllerClass??>
+    public class ${table.controllerName} extends ${superControllerClass} {
+<#else>
+    public class ${table.controllerName} {
+</#if>
+@Resource
+private ${table.serviceName} ${table.serviceName?uncap_first};
 
-    @ApiOperation("添加${table.comment!}")
-    @PostMapping("/${cfg.urlName}")
-    public Result<${entity}> insert(
+@ApiOperation("添加${table.comment!}")
+@PostMapping("/${cfg.urlName}")
+public Result<${entity}> insert(
     <#list table.fields as field>
         <#assign isOk = 1/>
         <#if keyPropertyName == field.propertyName >
@@ -74,7 +74,7 @@ import java.util.List;
             </#list>
         </#if>
         <#if isOk == 1>
-            @RequestParam @ApiParam(value = "${field.comment}",required = true) ${field.propertyType} ${field.propertyName},
+                @RequestParam @ApiParam(value = "${field.comment}",required = true) ${field.propertyType} ${field.propertyName}<#if field_has_next>,</#if>
         </#if>
     </#list>
     )  {
@@ -97,13 +97,13 @@ import java.util.List;
         </#if>
     </#list>
     .build();
-    ${entity?uncap_first}.insert();
-    return Result.success(${entity?uncap_first});
-    }
+${entity?uncap_first}.insert();
+return Result.success(${entity?uncap_first});
+}
 
-    @ApiOperation("修改${table.comment!}")
-    @PutMapping("/${cfg.urlName}/{${keyPropertyName}}")
-    public Result update(
+@ApiOperation("修改${table.comment!}")
+@PutMapping("/${cfg.urlName}/{${keyPropertyName}}")
+public Result update(
     @PathVariable @ApiParam(value = "${keyComment}", required = true) ${keyPropertyType} ${keyPropertyName},
     <#list table.fields as field>
         <#assign isOk = 1/>
@@ -119,7 +119,7 @@ import java.util.List;
             </#list>
         </#if>
         <#if isOk == 1>
-            @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName},
+            @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName}<#if field_has_next>,</#if>
         </#if>
     </#list>
     )  {
@@ -143,17 +143,17 @@ import java.util.List;
     return Result.fail(ResultCode.PARAM_NOT_COMPLETE_ERROR);
     }
     ${entity?uncap_first}.updateById();
-    return Result.success("修改成功");
+    return Result.success();
     }
 
     @ApiOperation("获取${table.comment!}列表")
     @GetMapping("/${cfg.urlName}")
     <#if (cfg.enablePage!"") == true>
-        public Result<Page<${entity}>> list(
+    public Result<Page<${entity}>> list(
         @RequestParam(defaultValue = "0") @ApiParam(value = "偏移量") Integer offset,
         @RequestParam(defaultValue = "10") @ApiParam(value = "限制") Integer limit,
     <#else>
-        public Result<List<${entity}>> list(
+    public Result<List<${entity}>> list(
     </#if>
     <#list table.fields as field>
         <#assign isOk = 1/>
@@ -169,7 +169,7 @@ import java.util.List;
             </#list>
         </#if>
         <#if isOk == 1>
-            @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName},
+                @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName}<#if field_has_next>,</#if>
         </#if>
     </#list>
     ) {
@@ -192,16 +192,24 @@ import java.util.List;
         </#if>
     </#list>
     .build();
+    Integer total = ${table.serviceName?uncap_first}.count(condition);
+    List<${entity}> list = new ArrayList<>();
+    if (total > 0) {
+    <#if (cfg.enablePage!"") == true>
+        condition.setOffset(offset);
+        condition.setLimit(limit);
+    </#if>
+    list = ${table.serviceName?uncap_first}.list(condition);
+    }
     <#if (cfg.enablePage!"") == true>
         Page<${entity}> result =new Page<>();
+        result.setTotal(total);
+        result.setRecords(list);
         result.setCurrent(offset);
         result.setSize(limit);
-        QueryWrapper<${entity}> wrapper = new QueryWrapper<>();
-        condition.selectPage(result, wrapper);
-        return Result.success(result);
-    <#else>
-        List<${entity}> list = ${table.serviceName?uncap_first}.list(condition);
-        return Result.success(list);
+     return Result.success(result);
+    <#else >
+     return Result.success(list);
     </#if>
 
     }
@@ -224,7 +232,7 @@ import java.util.List;
                 </#list>
             </#if>
             <#if isOk == 1>
-                @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName},
+                    @RequestParam(required = false) @ApiParam(value = "${field.comment}") ${field.propertyType} ${field.propertyName}<#if field_has_next>,</#if>
             </#if>
         </#list>
         )  {
@@ -271,10 +279,10 @@ import java.util.List;
     )  {
     ${entity} condition = ${entity}.builder().${keyPropertyName}(${keyPropertyName}).build();
     if (condition.selectById() == null) {
-    return Result.fail(ResultCode.PARAM_NOT_COMPLETE_ERROR);
-    }
+        return Result.fail(ResultCode.PARAM_NOT_COMPLETE_ERROR);
+        }
     condition.deleteById();
     return Result.success("删除成功");
     }
     }
-</#if>
+    </#if>
